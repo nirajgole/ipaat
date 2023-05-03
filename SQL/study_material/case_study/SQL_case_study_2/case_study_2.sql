@@ -1,0 +1,43 @@
+-- CREATE TABLE LOCATION (LOCATION_ID INT,CITY VARCHAR(10))
+
+-- INSERT INTO LOCATION VALUES(122,'New York'),
+-- (123, 'Dallas'),
+-- (124,'Chicago'),
+-- (167,'Boston')
+
+-- SELECT * FROM LOCATION
+
+-- CREATE TABLE DEPARTMENT (DEPARTMENT_ID INT, NAME VARCHAR(20), LOCATION_ID INT)
+
+-- INSERT INTO DEPARTMENT VALUES(10,'Accounting',122),
+-- (20,'Sales',124),
+-- (30,'Research',123),
+-- (40,'Operations',167)
+
+-- SELECT * FROM DEPARTMENT;
+
+-- CREATE TABLE JOB(JOB_ID INT,DESIGNATION VARCHAR(20))
+
+-- INSERT INTO JOB VALUES (667,'Clerk'),
+-- (668,'Staff'),
+-- (669,'Analyst'),
+-- (670,'Sales Person'),
+-- (671,'Manager'),
+-- (672,'President')
+
+-- SELECT * FROM JOB;
+
+-- CREATE TABLE EMPLOYEE (Employee_ID INT, Last_Name VARCHAR(20), First_Name VARCHAR(20), Middle_Name VARCHAR(20), 
+-- Job_ID INT, Manager_ID INT, Hire_Date DATE,Salary MONEY, Comm INT,Department_ID INT)
+
+-- INSERT INTO EMPLOYEE VALUES
+-- (7369, 'SMITH', 'JOHN', 'Q', 667, 7902, '17-DEC-84', 800, NULL, 20),
+-- (7499, 'ALLEN', 'KEVIN', 'J', 670, 7698, '20-FEB-85', 1600, 300, 30),
+-- (7505, 'DOYLE', 'JEAN', 'K', 671, 7839, '04-APR-85', 2850, NULL, 30),
+-- (7506, 'DENNIS', 'LYNN', 'S', 671, 7839, '15-MAY-85', 2750, NULL, 30),
+-- (7507, 'BAKER', 'LESLIE', 'D', 671, 7839, '10-JUN-85', 2200, NULL, 40),
+-- (7521, 'WARK', 'CYNTHIA', 'D', 670, 7698, '22-FEB-85', 1250, 500, 30)
+
+-- SELECT * FROM EMPLOYEE;
+
+
