@@ -3,3 +3,5 @@
 
 #thrice every hour
 */15,30,45 * * * * cronjob.sh
+
+# https://crontab.guru/
