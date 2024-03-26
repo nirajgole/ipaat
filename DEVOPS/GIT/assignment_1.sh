@@ -34,5 +34,9 @@ cat ~/.ssh/id_rsa.pub
 #copy output of above command and paste in respective github SSH keys account
 git push origin main
 
+#following are optional
+git tag 'devops_pratice' e3877ad
+git log --oneline
+
 #check output at following repo
 https://github.com/nirajgole/assignment_1
