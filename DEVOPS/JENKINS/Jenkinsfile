@@ -1,0 +1,23 @@
+pipeline {
+    agent any  // Use any available agent
+
+    triggers {
+        githubPush()
+    }
+
+    stages {
+        stage('Pull Code') {
+            steps {
+                git branch: 'develop', // Specify the branch to pull (optional)
+                    credentialsId: 'github-credential', // Replace with your credential ID (optional)
+                    url: 'https://github.com/nirajgole/assignment_1.git' // Replace with your Git repository URL (optional)
+                sh 'git pull origin main' // Pull latest changes from default branch (HEAD)
+            }
+        }
+        stage('Build') {
+            steps {
+                echo "Build Successful!"
+            }
+        }
+    }
+}
