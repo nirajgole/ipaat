@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prt-web-deployment  # Replace with a descriptive name
+spec:
+  replicas: 3  # Number of replicas (3 in this case)
+  selector:
+    matchLabels:
+      app: prt-web-website  # Matches pods with the label "app: my-website"
+  template:
+    metadata:
+      labels:
+        app: prt-web-website  # Label for pod identification
+    spec:
+      containers:
+      - name: prt-web-website  # Container name (can match image name)
+        image: torrentxx/website-prt-org-image:latest  # Replace with your Docker Hub username and image name
+        ports:
+          - containerPort: 80  # Container port (assuming your website runs on port 80)
