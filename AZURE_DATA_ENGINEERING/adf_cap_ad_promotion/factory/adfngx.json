@@ -1,0 +1,9 @@
+{
+	"name": "adfngx",
+	"location": "eastus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "4978358f-34c4-44e5-b90a-da2a7df6eb22",
+		"tenantId": "eea3f087-4129-48c3-871c-ef8273b1a3a9"
+	}
+}
