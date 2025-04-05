@@ -1,0 +1,20 @@
+{
+	"name": "dest",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage1",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "dest",
+				"fileSystem": "adpromo"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}
