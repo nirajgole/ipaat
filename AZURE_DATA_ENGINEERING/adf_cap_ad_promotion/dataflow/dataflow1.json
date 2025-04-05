@@ -12,28 +12,58 @@
 					"name": "source"
 				}
 			],
-			"sinks": [],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "source",
+						"type": "DatasetReference"
+					},
+					"name": "sink"
+				}
+			],
 			"transformations": [
 				{
-					"name": "filter1"
+					"name": "filter"
 				},
 				{
-					"name": "sort1"
+					"name": "sort",
+					"description": "sort in descending based on views and likes"
 				},
 				{
-					"name": "select1"
+					"name": "selectColumns"
 				}
 			],
 			"scriptLines": [
-				"source(allowSchemaDrift: true,",
+				"source(output(",
+				"          VideoID as short,",
+				"          VideoTitle as string,",
+				"          Views as long,",
+				"          Likes as integer,",
+				"          Dislikes as integer,",
+				"          Comments as integer,",
+				"          DurationinMinutes as short",
+				"     ),",
+				"     allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     limit: 100,",
 				"     ignoreNoFilesFound: false,",
 				"     moveFiles: ['src','src/processed']) ~> source",
-				"source filter(ERROR_FUNCTION('')) ~> filter1",
-				"filter1 sort(asc(ERROR_FUNCTION(''), true)) ~> sort1",
-				"sort1 select(skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true) ~> select1"
+				"source filter(Views>=8900000 && Likes>=300) ~> filter",
+				"filter sort(desc(Views, true),",
+				"     desc(Likes, true)) ~> sort",
+				"sort select(mapColumn(",
+				"          VideoID,",
+				"          VideoTitle",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> selectColumns",
+				"selectColumns sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     umask: 0022,",
+				"     preCommands: [],",
+				"     postCommands: [],",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink"
 			]
 		}
 	}
