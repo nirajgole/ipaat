@@ -1,0 +1,24 @@
+{
+	"name": "t_ad_promo",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Stopped",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "adf_ad_promo",
+					"type": "PipelineReference"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Minute",
+				"interval": 5,
+				"startTime": "2025-04-06T10:26:00",
+				"timeZone": "India Standard Time"
+			}
+		}
+	}
+}
