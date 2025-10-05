@@ -38,9 +38,13 @@ def hinge_loss_single(feature_vector, label, theta, theta_0):
         the hinge loss, as a float, associated with the given data point and
         parameters.
     """
-    # Your code here
-    raise NotImplementedError
+    margin = label * (np.dot(theta, feature_vector) + theta_0)
 
+    # Hinge Loss = max(0, 1 - margin)
+    hinge_loss = np.maximum(0, 1 - margin)
+
+    return float(hinge_loss)
+    raise NotImplementedError
 
 
 def hinge_loss_full(feature_matrix, labels, theta, theta_0):
@@ -60,11 +64,27 @@ def hinge_loss_full(feature_matrix, labels, theta, theta_0):
         parameters.  This number should be the average hinge loss across all of
     """
 
-    # Your code here
+    linear_scores = np.dot(feature_matrix, theta) + theta_0
+
+    # 2. Calculate the margin: labels * linear_scores
+    # This is an element-wise multiplication due to broadcasting, resulting in an N x 1 vector.
+    margins = labels * linear_scores
+
+    # 3. Calculate the hinge loss for each point: max(0, 1 - margin)
+    # The max function is applied element-wise.
+    individual_losses = np.maximum(0, 1 - margins)
+
+    # 4. Calculate the average hinge loss over the entire dataset
+    # np.mean computes the arithmetic mean of all elements in the array.
+    average_hinge_loss = np.mean(individual_losses)
+
+    return float(average_hinge_loss)
     raise NotImplementedError
 
 
 
+
+import numpy as np
 
 def perceptron_single_step_update(
         feature_vector,
@@ -73,7 +93,7 @@ def perceptron_single_step_update(
         current_theta_0):
     """
     Updates the classification parameters `theta` and `theta_0` via a single
-    step of the perceptron algorithm.  Returns new parameters rather than
+    step of the perceptron algorithm. Returns new parameters rather than
     modifying in-place.
 
     Args:
@@ -87,8 +107,27 @@ def perceptron_single_step_update(
         the updated feature-coefficient parameter `theta` as a numpy array
         the updated offset parameter `theta_0` as a floating point number
     """
-    # Your code here
-    raise NotImplementedError
+    # Calculate the current prediction score: score = theta^T * x + theta_0
+    score = np.dot(current_theta, feature_vector) + current_theta_0
+
+    # Check for a misclassification: label * score <= 0
+    # A prediction is considered a mistake if the margin (label * score) is non-positive.
+    if label * score <= 0:
+        # If misclassified, update parameters:
+        # new_theta = current_theta + label * feature_vector
+        new_theta = current_theta + label * feature_vector
+
+        # new_theta_0 = current_theta_0 + label
+        new_theta_0 = current_theta_0 + label
+
+        return new_theta, new_theta_0
+    else:
+        # If classified correctly (margin > 0), parameters remain unchanged.
+        # It's important to return copies or the original objects if they are immutable
+        # to ensure "not modifying in-place" as requested. Numpy arrays are mutable,
+        # so returning a copy of the original theta is safer if we want to strictly
+        # adhere to the spirit of "Returns new parameters".
+        return current_theta.copy(), current_theta_0
 
 
 
@@ -114,22 +153,29 @@ def perceptron(feature_matrix, labels, T):
         the offset parameter `theta_0` as a floating point number
             (found also after T iterations through the feature matrix).
     """
-    # Your code here
-    raise NotImplementedError
+    n_samples, n_features = feature_matrix.shape
+    theta = np.zeros(n_features)
+    theta_0 = 0.0
+
     for t in range(T):
-        for i in get_order(nsamples):
-            # Your code here
-            raise NotImplementedError
+        for i in get_order(n_samples):
+            theta, theta_0 = perceptron_single_step_update(
+                feature_matrix[i],
+                labels[i],
+                theta,
+                theta_0
+            )
+    return theta, theta_0
     # Your code here
     raise NotImplementedError
 
 
 
-def average_perceptron(feature_matrix, labels, T):
+def average_perceptron(feature_matrix, labels, num_iterations):
     """
-    Runs the average perceptron algorithm on a given dataset.  Runs `T`
+    Runs the average perceptron algorithm on a given dataset.  Runs `num_iterations`
     iterations through the dataset (we do not stop early) and therefore
-    averages over `T` many parameter values.
+    averages over `num_iterations` many parameter values.
 
     NOTE: Please use the previously implemented functions when applicable.
     Do not copy paste code from previous parts.
@@ -142,59 +188,83 @@ def average_perceptron(feature_matrix, labels, T):
             represents a single data point.
         `labels` - A numpy array where the kth element of the array is the
             correct classification of the kth row of the feature matrix.
-        `T` - An integer indicating how many times the perceptron algorithm
+        `num_iterations` - An integer indicating how many times the perceptron algorithm
             should iterate through the feature matrix.
 
     Returns a tuple containing two values:
         the average feature-coefficient parameter `theta` as a numpy array
-            (averaged over T iterations through the feature matrix)
+            (averaged over num_iterations iterations through the feature matrix)
         the average offset parameter `theta_0` as a floating point number
-            (averaged also over T iterations through the feature matrix).
+            (averaged also over num_iterations iterations through the feature matrix).
     """
-    # Your code here
-    raise NotImplementedError
+    n_samples, n_features = feature_matrix.shape
+    theta = np.zeros(n_features)
+    theta_0 = 0.0
+    theta_sum = np.zeros(n_features)
+    theta_0_sum = 0.0
+    count = 0
+
+    for t in range(num_iterations):
+        for i in get_order(n_samples):
+            theta, theta_0 = perceptron_single_step_update(
+                feature_matrix[i],
+                labels[i],
+                theta,
+                theta_0
+            )
+            theta_sum += theta
+            theta_0_sum += theta_0
+            count += 1
+
+    avg_theta = theta_sum / count
+    avg_theta_0 = theta_0_sum / count
+    return avg_theta, avg_theta_0
 
 
 def pegasos_single_step_update(
         feature_vector,
         label,
-        L,
+        lmbda,
         eta,
         theta,
         theta_0):
     """
     Updates the classification parameters `theta` and `theta_0` via a single
-    step of the Pegasos algorithm.  Returns new parameters rather than
+    step of the Pegasos algorithm. Returns new parameters rather than
     modifying in-place.
 
     Args:
-        `feature_vector` - A numpy array describing a single data point.
-        `label` - The correct classification of the feature vector.
-        `L` - The lamba value being used to update the parameters.
-        `eta` - Learning rate to update parameters.
-        `theta` - The old theta being used by the Pegasos
-            algorithm before this update.
-        `theta_0` - The old theta_0 being used by the
-            Pegasos algorithm before this update.
+        feature_vector - A numpy array describing a single data point.
+        label - The correct classification of the feature vector.
+        lmbda - The lambda value being used to update the parameters.
+        eta - Learning rate to update parameters.
+        theta - The old theta being used by the algorithm before this update.
+        theta_0 - The old theta_0 being used by the algorithm before this update.
     Returns:
         a tuple where the first element is a numpy array with the value of
-        theta after the old update has completed and the second element is a
-        real valued number with the value of theta_0 after the old updated has
+        theta after the update has completed and the second element is a
+        real valued number with the value of theta_0 after the update has
         completed.
     """
-    # Your code here
-    raise NotImplementedError
+    margin = label * (np.dot(theta, feature_vector) + theta_0)
+    if margin <= 1:
+        theta = (1 - eta * lmbda) * theta + eta * label * feature_vector
+        theta_0 = theta_0 + eta * label
+    else:
+        theta = (1 - eta * lmbda) * theta
+        # theta_0 remains unchanged
+    return theta, theta_0
 
 
 
-def pegasos(feature_matrix, labels, T, L):
+def pegasos(feature_matrix, labels, num_iterations, lambda_val):
     """
-    Runs the Pegasos algorithm on a given set of data. Runs T iterations
-    through the data set, there is no need to worry about stopping early.  For
+    Runs the Pegasos algorithm on a given set of data. Runs num_iterations iterations
+    through the data set, there is no need to worry about stopping early. For
     each update, set learning rate = 1/sqrt(t), where t is a counter for the
-    number of updates performed so far (between 1 and nT inclusive).
+    number of updates performed so far (between 1 and n*num_iterations inclusive).
 
-    NOTE: Please use the previously implemented functions when applicable.  Do
+    NOTE: Please use the previously implemented functions when applicable. Do
     not copy paste code from previous parts.
 
     Args:
@@ -202,20 +272,35 @@ def pegasos(feature_matrix, labels, T, L):
             represents a single data point.
         `labels` - A numpy array where the kth element of the array is the
             correct classification of the kth row of the feature matrix.
-        `T` - An integer indicating how many times the algorithm
+        `num_iterations` - An integer indicating how many times the algorithm
             should iterate through the feature matrix.
-        `L` - The lamba value being used to update the Pegasos
+        `lambda_val` - The lambda value being used to update the Pegasos
             algorithm parameters.
 
     Returns:
         a tuple where the first element is a numpy array with the value of the
-        theta, the linear classification parameter, found after T iterations
+        theta, the linear classification parameter, found after num_iterations iterations
         through the feature matrix and the second element is a real number with
         the value of the theta_0, the offset classification parameter, found
-        after T iterations through the feature matrix.
+        after num_iterations iterations through the feature matrix.
     """
-    # Your code here
-    raise NotImplementedError
+    n_samples, n_features = feature_matrix.shape
+    theta = np.zeros(n_features)
+    theta_0 = 0.0
+    t = 1
+    for _ in range(num_iterations):
+        for i in get_order(n_samples):
+            eta = 1.0 / np.sqrt(t)
+            theta, theta_0 = pegasos_single_step_update(
+                feature_matrix[i],
+                labels[i],
+                lambda_val,
+                eta,
+                theta,
+                theta_0
+            )
+            t += 1
+    return theta, theta_0
 
 
 
