@@ -1,6 +1,7 @@
 from string import punctuation, digits
 import numpy as np
 import random
+import utils
 
 
 
@@ -336,8 +337,8 @@ def classify(feature_matrix, theta, theta_0):
         given theta and theta_0. If a prediction is GREATER THAN zero, it
         should be considered a positive classification.
     """
-    # Your code here
-    raise NotImplementedError
+    scores = np.dot(feature_matrix, theta) + theta_0
+    return np.where(scores > 0, 1, -1)
 
 
 def classifier_accuracy(
@@ -373,8 +374,12 @@ def classifier_accuracy(
         trained classifier on the training data and the second element is the
         accuracy of the trained classifier on the validation data.
     """
-    # Your code here
-    raise NotImplementedError
+    theta, theta_0 = classifier(train_feature_matrix, train_labels, **kwargs)
+    train_preds = classify(train_feature_matrix, theta, theta_0)
+    val_preds = classify(val_feature_matrix, theta, theta_0)
+    train_acc = accuracy(train_preds, train_labels)
+    val_acc = accuracy(val_preds, val_labels)
+    return train_acc, val_acc
 
 
 
@@ -387,12 +392,12 @@ def extract_words(text):
         a list of lowercased words in the string, where punctuation and digits
         count as their own words.
     """
-    # Your code here
-    raise NotImplementedError
-
     for c in punctuation + digits:
         text = text.replace(c, ' ' + c + ' ')
     return text.lower().split()
+    raise NotImplementedError
+
+
 
 
 
@@ -407,15 +412,19 @@ def bag_of_words(texts, remove_stopword=False):
         a dictionary that maps each word appearing in `texts` to a unique
         integer `index`.
     """
-    # Your code here
-    raise NotImplementedError
+    # Define a basic stopword list if remove_stopword is True
+    stopword = set()
+    if remove_stopword:
+        stopword = utils.load_data('stopwords.txt')
 
     indices_by_word = {}  # maps word to unique index
     for text in texts:
         word_list = extract_words(text)
         for word in word_list:
-            if word in indices_by_word: continue
-            if word in stopword: continue
+            if word in indices_by_word:
+                continue
+            if remove_stopword and word in stopword:
+                continue
             indices_by_word[word] = len(indices_by_word)
 
     return indices_by_word
@@ -432,16 +441,15 @@ def extract_bow_feature_vectors(reviews, indices_by_word, binarize=True):
         matrix thus has shape (n, m), where n counts reviews and m counts words
         in the dictionary.
     """
-    # Your code here
     feature_matrix = np.zeros([len(reviews), len(indices_by_word)], dtype=np.float64)
     for i, text in enumerate(reviews):
         word_list = extract_words(text)
         for word in word_list:
-            if word not in indices_by_word: continue
+            if word not in indices_by_word:
+                continue
             feature_matrix[i, indices_by_word[word]] += 1
     if binarize:
-        # Your code here
-        raise NotImplementedError
+        feature_matrix[feature_matrix > 0] = 1
     return feature_matrix
 
 
