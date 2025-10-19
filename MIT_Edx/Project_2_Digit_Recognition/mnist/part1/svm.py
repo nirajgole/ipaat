@@ -41,6 +41,9 @@ def multi_class_svm(train_x, train_y, test_x):
     """
     Trains a linear SVM for multiclass classifciation using a one-vs-rest strategy
 
+    In scikit-learn's LinearSVC, the one-vs-rest strategy is used by default
+    when fitting to data with more than two unique classes.
+
     Args:
         train_x - (n, d) NumPy array (n datapoints each with d features)
         train_y - (n, ) NumPy array containing the labels (int) for each training data point
@@ -48,7 +51,24 @@ def multi_class_svm(train_x, train_y, test_x):
     Returns:
         pred_test_y - (m,) NumPy array containing the labels (int) for each test data point
     """
-    raise NotImplementedError
+    # 1. Instantiate the LinearSVC model with required parameters
+    # Use the same C and random_state as specified in the previous problem.
+    model = LinearSVC(
+        C=0.1,
+        random_state=0,
+        # max_iter is increased for robustness with larger/multi-class datasets
+        max_iter=5000
+    )
+
+    # 2. Fit the model using the training data
+    # LinearSVC automatically handles multi-class classification via OvR strategy.
+    model.fit(train_x, train_y)
+
+    # 3. Predict the labels for the test data
+    pred_test_y = model.predict(test_x)
+
+    # 4. Return the predictions
+    return pred_test_y
 
 
 def compute_test_error_svm(test_y, pred_test_y):
