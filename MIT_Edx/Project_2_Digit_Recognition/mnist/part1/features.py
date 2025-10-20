@@ -4,19 +4,35 @@ import matplotlib.pyplot as plt
 
 def project_onto_PC(X, pcs, n_components, feature_means):
     """
-    Given principal component vectors pcs = principal_components(X)
-    this function returns a new data array in which each sample in X
-    has been projected onto the first n_components principcal components.
+    Projects the dataset X onto the first n_components principal components.
+
+    Args:
+        X (np.ndarray): The dataset to project (n_samples x n_features).
+        pcs (np.ndarray): The full principal component matrix (eigenvectors)
+                          (n_features x n_features), sorted by eigenvalue.
+        n_components (int): The number of principal components to keep.
+        feature_means (np.ndarray): The mean of each feature (n_features,).
+
+    Returns:
+        np.ndarray: The projected data (n_samples x n_components).
     """
-    # TODO: first center data using the feature_means
-    # TODO: Return the projection of the centered dataset
-    #       on the first n_components principal components.
-    #       This should be an array with dimensions: n x n_components.
-    # Hint: these principal components = first n_components columns
-    #       of the eigenvectors returned by principal_components().
-    #       Note that each eigenvector is already be a unit-vector,
-    #       so the projection may be done using matrix multiplication.
-    raise NotImplementedError
+    # 1. Center the data X using the pre-computed feature_means.
+    # Z = X - feature_means
+    Z = X - feature_means
+
+    # 2. Select the first n_components principal components (eigenvectors).
+    # Since the eigenvectors are the columns of the 'pcs' matrix, we select
+    # the first n_components columns.
+    # W is the (n_features x n_components) matrix of top eigenvectors.
+    W = pcs[:, :n_components]
+
+    # 3. Compute the projection: P = Z @ W
+    # The matrix multiplication of the centered data (Z) by the principal
+    # components matrix (W) performs the projection.
+    # Shape: (n_samples x n_features) @ (n_features x n_components) -> (n_samples x n_components)
+    projected_data = Z @ W
+
+    return projected_data
 
 
 ### Functions which are already complete, for you to use ###
@@ -90,7 +106,7 @@ def center_data(X):
 
     Returns:
         - (n, d) NumPy array X' where for each i = 1, ..., n and j = 1, ..., d:
-        X'[i][j] = X[i][j] - means[j]       
+        X'[i][j] = X[i][j] - means[j]
 	- (d, ) NumPy array with the columns means
 
     """

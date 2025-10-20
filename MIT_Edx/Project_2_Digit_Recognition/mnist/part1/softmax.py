@@ -167,25 +167,45 @@ def update_y(train_y, test_y):
 
     Args:
         train_y - (n, ) NumPy array containing the labels (a number between 0-9)
-                 for each datapoint in the training set
+                  for each datapoint in the training set
         test_y - (n, ) NumPy array containing the labels (a number between 0-9)
-                for each datapoint in the test set
+                 for each datapoint in the test set
 
     Returns:
         train_y_mod3 - (n, ) NumPy array containing the new labels (a number between 0-2)
-                     for each datapoint in the training set
+                       for each datapoint in the training set
         test_y_mod3 - (n, ) NumPy array containing the new labels (a number between 0-2)
-                    for each datapoint in the test set
+                      for each datapoint in the test set
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    train_y_mod3 = train_y % 3
+    test_y_mod3 = test_y % 3
+
+    return train_y_mod3, test_y_mod3
+
+# def compute_test_error_mod3(X, Y, theta, temp_parameter):
+#     """
+#     Returns the error of these new labels when the classifier predicts the digit. (mod 3)
+
+#     Args:
+#         X - (n, d - 1) NumPy array (n datapoints each with d - 1 features)
+#         Y - (n, ) NumPy array containing the labels (a number from 0-2) for each
+#             data point
+#         theta - (k, d) NumPy array, where row j represents the parameters of our
+#                 model for label j
+#         temp_parameter - the temperature parameter of softmax function (scalar)
+
+#     Returns:
+#         test_error - the error rate of the classifier (scalar)
+#     """
+#     #YOUR CODE HERE
+#     raise NotImplementedError
 
 def compute_test_error_mod3(X, Y, theta, temp_parameter):
     """
     Returns the error of these new labels when the classifier predicts the digit. (mod 3)
 
     Args:
-        X - (n, d - 1) NumPy array (n datapoints each with d - 1 features)
+        X - (n, d - 1) NumPy array (n data points each with d - 1 features)
         Y - (n, ) NumPy array containing the labels (a number from 0-2) for each
             data point
         theta - (k, d) NumPy array, where row j represents the parameters of our
@@ -195,8 +215,12 @@ def compute_test_error_mod3(X, Y, theta, temp_parameter):
     Returns:
         test_error - the error rate of the classifier (scalar)
     """
-    #YOUR CODE HERE
-    raise NotImplementedError
+    # Get predicted labels (0-9), convert to mod 3 and compare with true labels mod 3
+    assigned_labels = get_classification(X, theta, temp_parameter)
+    assigned_labels_mod3 = assigned_labels % 3
+    Y_mod3 = Y % 3
+    test_error = 1 - np.mean(assigned_labels_mod3 == Y_mod3)
+    return test_error
 
 def softmax_regression(X, Y, temp_parameter, alpha, lambda_factor, k, num_iterations):
     """
@@ -252,6 +276,5 @@ def plot_cost_function_over_time(cost_function_history):
     plt.show()
 
 def compute_test_error(X, Y, theta, temp_parameter):
-    error_count = 0.
     assigned_labels = get_classification(X, theta, temp_parameter)
     return 1 - np.mean(assigned_labels == Y)
